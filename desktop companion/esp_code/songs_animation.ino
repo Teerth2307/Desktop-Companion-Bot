@@ -28,7 +28,7 @@
  * You also need the Adafruit_MPU6050 and Adafruit_Sensor libraries.
  * ======================================================================
  */
-
+ 
 // --- Display Libraries ---
 #include "SPI.h"
 #include "TFT_eSPI.h"
@@ -163,7 +163,52 @@ void setup() {
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
   delay(100);
+
+ 
+
 }
+ // --- Shouting Animation ---
+void shoutAnimation() {
+  // Fill mouth area with bright color for the shout
+  int mX = mouthX + offsetX;
+  int mW = baseMouthWidth;
+  tft.fillRect(mX, mouthY, mW, 25, TFT_RED); // Red = shouting
+
+  // Draw wide open mouth (oval)
+  tft.fillEllipse(mX + mW/2, mouthY + 13, mW/2, 12, TFT_WHITE);
+
+  // Optional: Draw jagged "voice spikes"
+  for (int i = 0; i < 10; i++) {
+    tft.drawLine(mX + (i * mW / 10), mouthY + 25, mX + (i * mW / 10), mouthY + 35 + random(0, 6), TFT_YELLOW);
+  }
+
+  // Pause a little for effect
+  delay(130);
+
+  // Erase animation after the effect
+  tft.fillRect(mX, mouthY, mW, 35, TFT_BLACK);
+}
+// --- Silence Animation ---
+void silenceAnimation() {
+  int mX = mouthX + offsetX;
+  int mW = baseMouthWidth;
+
+  // Draw a closed mouth (thin horizontal line)
+  tft.fillRect(mX, mouthY + 14, mW, 4, TFT_WHITE);
+
+  // Draw a "finger" (vertical thin rectangle) over the mouth
+  tft.fillRect(mX + mW/2 - 3, mouthY + 6, 6, 20, TFT_LIGHTGREY);
+
+  // Optional: Draw a small "shh" bubble above the mouth
+  tft.setTextColor(TFT_SKYBLUE, TFT_BLACK);
+  tft.drawCentreString("shh...", mX + mW/2, mouthY - 20, 2);
+
+  delay(180); // Pause for effect
+
+  // Erase after effect
+  tft.fillRect(mX, mouthY - 22, mW, 46, TFT_BLACK);
+}
+
 
 void loop() {
   unsigned long currentTime = millis();
@@ -215,23 +260,25 @@ void loop() {
   {
     // Tilted FORWARD (Y-axis positive)
     if (a.acceleration.y > TILT_THRESHOLD) {
-      Serial.println("VOL_UP"); // Send command to Python
+      Serial.println("VOL_DOWN"); // Send command to Python
       lastVolTime = millis();
       
       // --- COMMAND: SET FACE TO "VOL UP" ---
       newExpression = SMILE;
       newTargetEyeWidth = baseEyeWidth - 15; // Smaller eyes
       newTargetEyeHeight = baseEyeHeight - 15;
+      silenceAnimation();
     }
     // Tilted BACK (Y-axis negative)
     else if (a.acceleration.y < -TILT_THRESHOLD) {
-      Serial.println("VOL_DOWN"); // Send command to Python
+      Serial.println("VOL_UP"); // Send command to Python
       lastVolTime = millis();
       
       // --- COMMAND: SET FACE TO "VOL DOWN" ---
       newExpression = SAD;
       newTargetEyeWidth = baseEyeWidth + 10; // Bigger eyes
       newTargetEyeHeight = baseEyeHeight + 10;
+      shoutAnimation();
     }
   }
   
