@@ -1,4 +1,4 @@
-# ChotuBot - Gesture-Based Media Controller
+# Gesture-Based Media Controller
 
 A cross-platform Python application that receives gesture commands from an ESP microcontroller via serial communication and controls media playback and volume on your computer.
 
