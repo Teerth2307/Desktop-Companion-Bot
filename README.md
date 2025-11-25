@@ -24,11 +24,6 @@ A cross-platform Python application that receives gesture commands from an ESP m
 ## Installation
 
 ### 1. Clone or download the repository
-
-```bash
-cd chotubot
-```
-
 ### 2. Create a virtual environment (recommended)
 
 ```bash
